@@ -1,0 +1,161 @@
+[create folders: 
+* DICOM (with copies scanner data), 
+* ANATOMICAL 
+* FUNCTIONAL
+* SCRIPTS (with copies of prepared scripts; .mat files)
+* RESULTS ]
+
+>Matlab
+>spm
+>fMRI
+
+[set Current Directory in Matlab]
+
+>DICOM import
+[navigate to DICOM\PA000000\ST000000\SE00000X, X is scan series
+Normally,
+X=0: discovery
+X=1: anatomical 
+X=2: first fMRI run...etc]
+[select an integer multiple of 36 number of files (complete volumes only)]
+ select FUNCTIONAL as output folder; wait!]
+
+>Realign(Est&Res)
+Data
+New Session  ***ADD BLOCKS AS SEPARATE SESSIONS?
+.Session
+Select Files
+[select all s* images from functional scan]
+[save as realign.mat (disk icon)]
+[run (green triangle)]
+[copy rp* file as movepars.txt to use later as regressor]
+[optional: save result figure to keep track of motion corrections]
+
+>Slice timing
+Data
+New Session
+.Session
+Select Files
+[select all rs* (filter ^r.*)]
+[save as timing.mat]
+[run]
+
+>Coregister(Estimate)
+Reference image
+Select Files
+[select means* from functional]
+Source Image
+Select Files
+[select s* from anatomical]
+[save as coreg.mat]
+[run]
+
+>Segment
+Data
+Select Files
+[select s* from anatomical]
+[save as segment.mat]
+[run]
+
+>Normalise(Write)
+Data
+.Subject
+..Parameter File
+Select Files
+[select s*****_seg_sn.mat from anatomical]
+..Images to Write
+Select Files
+[select ars* from functional]
+[also select means* from functional]
+[save as normalise.mat]
+[run]
+
+>Normalise(Write)
+Data
+.Subject
+..Parameter File
+Select Files
+[select s*****_seg_sn.mat from anatomical]
+..Images to Write
+Select Files
+[select ms* from anatomical]
+[also select c1s* and c2s* from anatomical]
+[save as norm_struct.mat]
+[run]
+
+>Render...
+Xtract Surface
+[select wc1s* and wc2s* from anatomical]
+Save...Rendering and Surface
+[optional: save rendered image]
+[optional: repeat for c1s*/c2s* to render unnormalized version]
+
+>Smooth
+Images to Smooth
+Select Files
+[select wars* from functional]
+[save as smooth.mat]
+[run]
+
+[make sure you have movepars.txt from realignment (rp*.txt)]
+
+>Specify 1st-level
+Directory
+Select Files
+[select results directory]
+Data & Design
+.Subject/Session
+..Scans
+Select Files
+[select swars* from functional]
+..Conditions
+....Name: fixation
+....Onsets
+Edit Value
+(copy-paste condition onsets from excel, in seconds)
+..Conditions
+....Name: words
+....Onsets
+Edit Value
+(copy-paste condition onsets from excel, in seconds)
+..Conditions
+....Name: pseudo
+....Onsets
+Edit Value
+(copy-paste condition onsets from excel, in seconds)
+..Multiple regressors
+Select Files
+(select movepars.txt ***DON'T FORGET TO UPDATE!)
+[save as model1stlevel.mat]
+[run]
+
+(optionally, >Review / Design / Explore )
+
+>Estimate
+Select SPM.mat
+Select Files
+(select SPM.mat from functional)
+[save as estimate.mat]
+[run]
+
+>Results
+(select SPM.mat from functional)
+t-contrasts
+Define new contrast...
+name: words>fixation
+contrast: [-1 0 0 1 0 0 0 0 0] ...submit 
+ (each triplet includes HRF&derivatives)
+OK
+Define new contrast...
+name: pseudo>fixation
+contrast: [-1 0 0 0 0 0 1 0 0] ...submit
+OK
+Done
+Apply masking: none [enter]
+title for comparison [enter]
+p value adjustment: FWE [enter]
+p value: 0.05 [enter]
+
+overlays...
+Sections
+[select wms* from anatomical]
