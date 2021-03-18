@@ -13,18 +13,6 @@ results_path=['../results'];
 mkdir([results_path '/reprod']);
 
 
-%% following TLE patients are included:
-%  'afif_yamina'
-%    'ayad'
-%    'bullens'
-%    'ford_daniel'
-%    'jenkins_ruth'
-%    'koyen_joanna'
-%    'nossin_ilse'
-%    'soons'
-%    'van_beneden_jan'
-%    'vanden_plas_kristien'
-
 
 %% PREPARE DATA
 left=[1 1 0   0   0  1  1  0   1   0]; %% invert left temporal lobe data

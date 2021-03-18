@@ -13,24 +13,12 @@
 function jica_vs_jmtf_group_tle
 
 % set path
-addpath(genpath('C:\Users\cchatzic\OneDrive - JNJ\Desktop\CMTF'));
-data_path=['C:\Users\cchatzic\OneDrive - JNJ\Desktop\CMTF\data'];  %%% same as in /esat/biomeddata/_Biomed_INVENTORY/Data/EEG-fMRI/Epilepsy
-results_path=['C:\Users\cchatzic\OneDrive - JNJ\Desktop\CMTF\results'];
-mkdir([results_path '\jica']);
-mkdir([results_path '\jmtf']);
+addpath(genpath('../'));
+data_path=['../data'];  %%% same as in /esat/biomeddata/_Biomed_INVENTORY/Data/EEG-fMRI/Epilepsy
+results_path=['../results'];
+mkdir([results_path '/jica']);
+mkdir([results_path '/jmtf']);
 
-
-%% following TLE patients are included:
-%  'afif_yamina'
-%    'ayad'
-%    'bullens'
-%    'ford_daniel'
-%    'jenkins_ruth'
-%    'koyen_joanna'
-%    'nossin_ilse'
-%    'soons'
-%    'van_beneden_jan'
-%    'vanden_plas_kristien'
 
 
 %% PREPARE DATA
@@ -43,9 +31,9 @@ fMRI_matrix=[];
 for i=1:10%numel(pats)
     
     try
-        vv=spm_vol([data_path '\patient' num2str(i) '\spmT_0001.nii']);
+        vv=spm_vol([data_path '/patient' num2str(i) '/spmT_0001.nii']);
     catch
-        vv=spm_vol([data_path '\patient' num2str(i) '\spmT_0001.hdr']);
+        vv=spm_vol([data_path '/patient' num2str(i) '/spmT_0001.hdr']);
     end
     vv=spm_read_vols(vv);
     
@@ -69,11 +57,11 @@ avg_act=reshape(zscore(avg_act(:)/10),[79 95 68]);
 
 % save the average activation
  try
-        vv=spm_vol([data_path '\patient1\spmT_0001.nii']);
+        vv=spm_vol([data_path '/patient1/spmT_0001.nii']);
     catch
-        vv=spm_vol([data_path '\patient1\spmT_0001.hdr']);
+        vv=spm_vol([data_path '/patient1/spmT_0001.hdr']);
     end
-vv.fname=[results_path '\avg_mirrored_spm.img'];
+vv.fname=[results_path '/avg_mirrored_spm.img'];
 spm_write_vol(vv,avg_act);
 mask_ind=find(abs(avg_act)>3);
 fMRI_matrix=fMRI_matrix(:,mask_ind);
@@ -83,7 +71,7 @@ fMRI_matrix=fMRI_matrix(:,mask_ind);
 
 for i=1:10%numel(pats)
     
-    load([data_path '\patient' num2str(i) '\average_spike.mat']);
+    load([data_path '/patient' num2str(i) '/average_spike.mat']);
     if left(i) %% mirror the channels of left TLE patients
         
         allspikes(i,:,:)=spikes_avg2d;
@@ -246,13 +234,13 @@ for iter=1:5
     
     
     
-    save([results_path '\jmtf\resultsR' num2str(R) 'spmt_fix'], 'solution','out' );
+    save([results_path '/jmtf/resultsR' num2str(R) 'spmt_fix'], 'solution','out' );
     
-        vv=spm_vol([data_path '\patient1\spmT_0001.hdr']);
+        vv=spm_vol([data_path '/patient1/spmT_0001.hdr']);
     
     for i=1:R
         
-        vv.fname=[results_path '\jmtf\spmt_fix_R' num2str(R) '_s' num2str(i) '_iter' num2str(iter) '.img'];
+        vv.fname=[results_path '/jmtf/spmt_fix_R' num2str(R) '_s' num2str(i) '_iter' num2str(iter) '.img'];
         
         fmri_comp=zeros(vv.dim);
         fmri_comp(mask_ind)=zscore(solution{R,iter}.factors.W(:,i));
@@ -301,9 +289,9 @@ for ix=1:nic
 end
 
 
-   vv=spm_vol([data_path '\patient1\spmT_0001.hdr']);
+   vv=spm_vol([data_path '/patient1/spmT_0001.hdr']);
 for i=1:size(sources_e,2);
-    vv.fname=[results_path '\jica\spmt_R' num2str(nic) '_s' num2str(i) '.img'];
+    vv.fname=[results_path '/jica/spmt_R' num2str(nic) '_s' num2str(i) '.img'];
     fmri_comp=zeros(vv.dim);
     fmri_comp(mask_ind)=zscore(sources_f(:,i));
     spm_write_vol(vv,reshape(fmri_comp,[79 95 68]));
@@ -368,16 +356,16 @@ tmp=corr(sol_jmtf_noc.factors.V,sol_jmtf_fix.factors.V); tmp=tmp(1,:); [~,order_
 
 % get ROIs
 
-vv=spm_vol([data_path '\ROI\rdDMN_cort_subcort.nii']);
+vv=spm_vol([data_path '/ROI/rdDMN_cort_subcort.nii']);
 dDMN=spm_read_vols(vv); dDMN(abs(avg_act)<3)=0;
 
 
-vv=spm_vol([data_path '\ROI\rRECN_cort_subcort.nii']);
+vv=spm_vol([data_path '/ROI/rRECN_cort_subcort.nii']);
 recn=spm_read_vols(vv); recn(abs(avg_act)<3)=0;
 
 
 
-vv=spm_vol([data_path '\ROI\rLECN_cort_subcort.nii']);
+vv=spm_vol([data_path '/ROI/rLECN_cort_subcort.nii']);
 lecn=spm_read_vols(vv); lecn(abs(avg_act)<3)=0;
 
 
@@ -385,16 +373,16 @@ ecn=lecn|recn;
 
 
 
-vv=spm_vol([data_path '\ROI\rvDMN_cort_subcort.nii']);
+vv=spm_vol([data_path '/ROI/rvDMN_cort_subcort.nii']);
 vDMN=spm_read_vols(vv); vDMN(abs(avg_act)<3)=0;
 
-Sf1=spm_vol([data_path '\ROI\s1.nii']);
+Sf1=spm_vol([data_path '/ROI/s1.nii']);
 Sf1=spm_read_vols(Sf1); Sf1=(Sf1>3);
 
-Sf2=spm_vol([data_path '\ROI\s2.nii']);
+Sf2=spm_vol([data_path '/ROI/s2.nii']);
 Sf2=spm_read_vols(Sf2); Sf2=(Sf2>3);
 
-Sf3=spm_vol([data_path '\ROI\s3.nii']);
+Sf3=spm_vol([data_path '/ROI/s3.nii']);
 Sf3=spm_read_vols(Sf3); Sf3=(Sf3>3);
 
 clear tmp;
@@ -444,10 +432,6 @@ end
 compareDistribPlot(fmri_comp, tmp)
 title('fixed jMTF')
 ylim([-3.2 3.2])
-savefig('SineWave.fig')
-
-
-
 
 
 function plotTemporalSignature(sources,figure_title,EEG_tensor)
@@ -479,8 +463,6 @@ for i=1:size(sources,2);
 end
 xlabel('time (ms)')
 title(figure_title)
-savefig(figure_title)
-
 
 function compareDistribPlot(fmri_comp, tmp)
 
@@ -519,6 +501,5 @@ end
 
 set(gca,'XTick',1.5:3:15);
 set(gca,'XTickLabel',{'rTL';'lTL';'OL';'DMN';'ECN'})
-savefig('Comparison')
 
 
